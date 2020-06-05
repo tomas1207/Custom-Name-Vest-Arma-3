@@ -28,59 +28,54 @@ def printProgressBar(iteration, total, prefix='', suffix='', decimals=1, length=
 
 
 nomes = ['Tomas1207','Mr Rato','Andre','TheBigOne','Stone Ricci','Rui_Sludge','Mata Pombos','Kaos','Crisostomo','MiTraPT','MacgyverPT','Dog','Costa','SrWer','MaG','NicoFuzu','Krespin','Rodriguez','Batman','Ranger','Birta','Telmo','Red']
-#TODO: ReadFile 
-#nomes =['Tomas1207']
-x= 986/1173
-y= 1229/1265
-x1 = 988/1171
-y1 = 1228/1266
-userinput = "desert"
+types = ['Desert','DPM']
+#x= 986/1173
+#y= 1229/1265
+#x1 = 988/1171
+#y1 = 1228/1266
+userinput = ""
 counter = 0
 total = len(nomes)
-for nome in nomes:
-    counter +=1
-    printProgressBar(counter,total,prefix="Progress:",suffix='Complete', length=50)
-    if userinput == "desert":
-        image = Image.open('.\Image\Main2.jpg')
-        if len(nome) > 10:
-            font_type = ImageFont.truetype('.\LLLIBERT.TTF',24)
-        else:
-            font_type = ImageFont.truetype('.\LLLIBERT.TTF',26)
 
-        im = ImageOps.mirror(image)
-        draw = ImageDraw.Draw(im)
-        text = draw.textsize(nome[::-1],font_type)
-        draw.text(xy=(((1060+874)/2)-text[0]/2,((1267+1227)/2)-text[1]/2),text=nome,font=font_type)
-        nome = nome.replace(" ","").lower()
-        im.save("mirrorImagens/PT_DPM_Desert_"+ nome +"_vests.png")
-
-        imagepos = Image.open("mirrorImagens/PT_DPM_Desert_"+ nome +"_vests.png")
-        img = ImageOps.mirror(imagepos)
-        
-        img.save("FinalImagens/PT_DPM_Desert_"+ nome + "_vests.png")
-        
-        driveinfo = subprocess.Popen(f'powershell.exe ..\ImageToPAA\ImageToPAA.exe ..\\PTsimsColetes\\FinalImagens\\PT_DPM_Desert_{nome}_vests.png ..\Mod\\addons\\pt_items\\data\\DPM\\PT_DPM_Desert_{nome}_vests.paa',stdout=subprocess.DEVNULL)
+def namecontrol(name):
+    if len(name) > 10:
+        font_type = ImageFont.truetype('.\LLLIBERT.TTF',24)
     else:
-        image = Image.open('.\Image\Main.jpg')
-        if len(nome) > 10:
-            font_type = ImageFont.truetype('.\LLLIBERT.TTF',24)
-        else:
-            font_type = ImageFont.truetype('.\LLLIBERT.TTF',26)
+        font_type = ImageFont.truetype('.\LLLIBERT.TTF',26)
+    return font_type
 
-        im = ImageOps.mirror(image)
-        draw = ImageDraw.Draw(im)
-        text = draw.textsize(nome[::-1],font_type)
-        draw.text(xy=(((1060+874)/2)-text[0]/2,((1267+1227)/2)-text[1]/2),text=nome,font=font_type)
-        nome = nome.replace(" ","").lower()
-        im.save("mirrorImagens/PT_DPM_"+ nome +"_vests.png")
+def mirroImg(image):
+    return ImageOps.mirror(image)
+ 
 
-        imagepos = Image.open("mirrorImagens/PT_DPM_"+ nome +"_vests.png")
-        img = ImageOps.mirror(imagepos)
+def textdrawonimg(mirro,nome,font_type):
+    draw = ImageDraw.Draw(mirro)
+    text = draw.textsize(nome[::-1],font_type)
+    draw.text(xy=(((1060+874)/2)-text[0]/2,((1267+1227)/2)-text[1]/2),text=nome,font=font_type)
+    nome = nome.replace(" ","").lower()
+    mirro.save("mirrorImagens/PT_DPM_Desert_"+ nome +"_vests.png")
+
+def opentypeimg(tipo):
+    return Image.open(f'.\Image\{type}.jpg')
+
+def unmirroandreadytopack(tipo,nome):
+    imagepos = Image.open("mirrorImagens/PT_DPM_"+tipo+"_"+ nome +"_vests.png")
+    img = mirroImg(imagepos)
+    img.save("FinalImagens/PT_DPM_"+tipo+"_"+ nome + "_vests.png")
+
+def imgageCretator(tipo):
+
+    for nome in nomes:
+        counter +=1
+        printProgressBar(counter,total,prefix="Progress:",suffix='Complete', length=50)
+        textdrawonimg(mirroImg(opentypeimg(tipo)),nome,namecontrol(nome))
+        unmirroandreadytopack(tipo,nome)
+        driveinfo = subprocess.Popen(f'powershell.exe ..\ImageToPAA\ImageToPAA.exe ..\\PTsimsColetes\\FinalImagens\\PT_DPM_{tipo}_{nome}_vests.png ..\\Mod\\addons\\pt_items\\data\\DPM\\PT_DPM_{tipo}_{nome}_vests.paa',stdout=subprocess.DEVNULL)
+    
         
-        img.save("FinalImagens/PT_DPM_"+ nome + "_vests.png")
-        
-        driveinfo = subprocess.Popen(f'powershell.exe ..\ImageToPAA\ImageToPAA.exe ..\\PTsimsColetes\\FinalImagens\\PT_DPM_{nome}_vests.png ..\Mod\\addons\\pt_items\\data\\DPM\\PT_DPM_{nome}_vests.paa',stdout=subprocess.DEVNULL)
-        
+        #driveinfo = subprocess.Popen(f'powershell.exe ..\ImageToPAA\ImageToPAA.exe ..\\PTsimsColetes\\FinalImagens\\PT_DPM_{nome}_vests.png ..\\Mod\\addons\\pt_items\\data\\DPM\\PT_DPM_{nome}_vests.paa',stdout=subprocess.DEVNULL)
+
+def writeconfig(nome):
     with open('..\\Mod\\addons\\pt_items\\config.cpp','r+')as config:
         lines = config.readlines()
         for line in lines:
